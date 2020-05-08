@@ -28,7 +28,7 @@ Change `192.168.0.18` to your server's IP address
 
 With default PHP 7.3 (php-fpm) and MariaDB 10.3 MySQL server
 
-As per [official install page instructions](https://centminmod.com/install.html)
+As per [official install page instructions](https://centminmod.com/install.html) or you can try advanced install guide at [https://servermanager.guide/117/centmin-mod-advanced-customised-installation-guide/](https://servermanager.guide/117/centmin-mod-advanced-customised-installation-guide/).
 
 ```
 yum -y update; curl -O https://centminmod.com/betainstaller73.sh && chmod 0700 betainstaller73.sh && bash betainstaller73.sh
