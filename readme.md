@@ -12,7 +12,9 @@ Previous Caddy benchmarks
 
 ## Installation requirements and configuration
 
-1. Setup /etc/hosts local DNS override for test dummy domain names `ngx.domain.com` and `caddy.domain.com`
+### 1. Setup /etc/hosts local DNS override for test dummy domain names 
+
+For `ngx.domain.com` and `caddy.domain.com`
 
 Change `192.168.0.18` to your server's IP address
 
@@ -22,7 +24,9 @@ Change `192.168.0.18` to your server's IP address
 192.168.0.18 caddy.domain.com
 ```
 
-2. Install Centmin Mod 123.09beta01 LEMP stack on CentOS 7 64bit server with default PHP 7.3 (php-fpm) and MariaDB 10.3 MySQL server
+### 2. Install Centmin Mod 123.09beta01 LEMP stack on CentOS 7 64bit server 
+
+With default PHP 7.3 (php-fpm) and MariaDB 10.3 MySQL server
 
 As per [official install page instructions](https://centminmod.com/install.html)
 
@@ -30,7 +34,7 @@ As per [official install page instructions](https://centminmod.com/install.html)
 yum -y update; curl -O https://centminmod.com/betainstaller73.sh && chmod 0700 betainstaller73.sh && bash betainstaller73.sh
 ```
 
-3. Create Nginx non-HTTPS (port 80) & HTTPS (port 443) vhost sites
+### 3. Create Nginx non-HTTPS (port 80) & HTTPS (port 443) vhost sites
 
 Centmin Mod Nginx can create Nginx vhost sites via `centmin.sh` shell based menu or via `nv` command line. For this guide, I will use `nv` command line:
 
@@ -73,7 +77,7 @@ nv -d ngx.domain.com -s y -u $(pwgen -1cnys 31)
 * The first variable `LETSENCRYPT_DETECT='y'` enables regular RSA 2048bit SSL certificates via Letsencrypt.
 * While second variable `DUALCERTS='y'` enables dual RSA 2048bit + ECDSA 256bit SSL certificate mode with a second Letsencrypt SSL certificated being obtained that is ECDSA 256bit based. Dual SSL certificates allow Centmin Mod Nginx to serve better performance based ECDSA 256bit SSL certificates to web browser and clients that support such certificates while falling back to traditional standard RSA 2048bit SSL certificates for older web browser and clients that do not support ECDSA 256bit. 
 
-4. Install Caddy v2 via COPR EPEL 7 YUM repository
+### 4. Install Caddy v2 via COPR EPEL 7 YUM repository
 
 Install Caddy v2 via COPR EPEL 7 YUM repo ensuring to disable EPEL repo to prevent installing EPEL's Caddy v1.x version.
 
@@ -108,7 +112,7 @@ journalctl -u caddy --no-pager
 curl -s localhost:2019/config/ | jq
 ```
 
-5. Configure Caddy v2 Caddyfile non-HTTPS (port 81) & HTTPS (port 4444) local internal self-signed SSL certificates 
+### 5. Configure Caddy v2 Caddyfile non-HTTPS (port 81) & HTTPS (port 4444) local internal self-signed SSL certificates 
 
 Backup default Caddyfile
 
@@ -186,7 +190,7 @@ caddyrestart
 caddystatus
 ```
 
-6. CSF Firewall Configuration
+### 6. CSF Firewall Configuration
 
 Centmin Mod LEMP stack installs [CSF Firewall](https://centminmod.com/csf_firewall.html) as a wrapper to iptables so you need to configure the TCP/UDP ports for custom ports.
 
@@ -206,7 +210,7 @@ egrep '^TCP_|^TCP6_|^UDP_|^UDP6_' /etc/csf/csf.conf
 csf -ra
 ```
 
-7. Verify Nginx & Caddy sites are working
+### 7. Verify Nginx & Caddy sites are working
 
 Check Caddy and Nginx versions
 
