@@ -343,14 +343,14 @@ h2load HTTP/2 HTTPS test for Caddy HTTPS on port 4444 at `https://caddy.domain.c
 
 ##### HTTP/2 HTTPS Benchmarks
 
-| server | test | requests/s | ttfb min | ttfb avg | ttfb max | cipher | protocol | successful req | failed req |
+| server | h2load HTTP/2 | requests/s | ttfb min | ttfb avg | ttfb max | cipher | protocol | successful req | failed req |
 | ---| --- |--- |--- |--- |--- |--- |--- |---|---|
-| caddy v2 | h2load HTTP/2 -t1 -c150 -n1000 -m50  | 959.57 | 213.30ms | 696.74ms | 1.03s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 100% | 0% |
-| caddy v2 | h2load HTTP/2 -t1 -c500 -n2000 -m100  | 990.03 | 711.60ms | 1.36s | 1.98s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 100% | 0% |
-| caddy v2 | h2load HTTP/2 -t1 -c1000 -n10000 -m100  | 1049.00 | 965.65ms | 3.34s | 6.53s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 68.89% | 31.11% |
-| nginx 1.17.10 | h2load HTTP/2 -t1 -c150 -n1000 -m50  | 2224.74 | 158.04ms | 300.22ms | 440.22ms | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
-| nginx 1.17.10 | h2load HTTP/2 -t1 -c500 -n2000 -m100  | 1600.52 | 583.80ms | 861.70ms | 1.23s | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
-| nginx 1.17.10 | h2load HTTP/2 -t1 -c1000 -n10000 -m100  | 1912.05 | 949.61ms | 2.98s | 5.16s | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
+| caddy v2 | -t1 -c150 -n1000 -m50  | 959.57 | 213.30ms | 696.74ms | 1.03s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 100% | 0% |
+| caddy v2 | -t1 -c500 -n2000 -m100  | 990.03 | 711.60ms | 1.36s | 1.98s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 100% | 0% |
+| caddy v2 | -t1 -c1000 -n10000 -m100  | 1049.00 | 965.65ms | 3.34s | 6.53s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 68.89% | 31.11% |
+| nginx 1.17.10 | -t1 -c150 -n1000 -m50  | 2224.74 | 158.04ms | 300.22ms | 440.22ms | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
+| nginx 1.17.10 | -t1 -c500 -n2000 -m100  | 1600.52 | 583.80ms | 861.70ms | 1.23s | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
+| nginx 1.17.10 | -t1 -c1000 -n10000 -m100  | 1912.05 | 949.61ms | 2.98s | 5.16s | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
 
 Caddy at 150 user concurrency
 
@@ -693,14 +693,14 @@ h2load HTTP/3 TLSv1.3 test
 
 ##### HTTP/3 HTTPS Benchmarks
 
-| server | test | requests/s | ttfb min | ttfb avg | ttfb max | cipher | protocol | successful req | failed req |
+| server | h2load HTTP/3 | requests/s | ttfb min | ttfb avg | ttfb max | cipher | protocol | successful req | failed req |
 | ---| --- |--- |--- |--- |--- |--- |--- |---|---|
-| caddy v2 | h2load HTTP/3 -t1 -c150 -n1000 -m50  | 594.60 | 230.02ms | 590.87ms | 1.65s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
-| caddy v2 | h2load HTTP/3 -t1 -c500 -n2000 -m100  | 333.49 | 353.84ms | 1.89s | 5.98s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
-| caddy v2 | h2load HTTP/3 -t1 -c1000 -n10000 -m100  | failed | failed | failed | failed | -  | - | 0% | 100% |
-| nginx 1.16.1 CF HTTP/3 patched | h2load HTTP/3 -t1 -c150 -n1000 -m50  | 1856.67 | 213.84ms | 333.80ms | 510.07ms | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
-| nginx 1.16.1 CF HTTP/3 patched | h2load HTTP/3 -t1 -c500 -n2000 -m100  | 842.13 | 325.78ms | 834.50ms | 1.59s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
-| nginx 1.16.1 CF HTTP/3 patched | h2load HTTP/3 -t1 -c1000 -n10000 -m100  | 847.89 | 657.03ms | 3.58s | 9.09s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| caddy v2 | -t1 -c150 -n1000 -m50  | 594.60 | 230.02ms | 590.87ms | 1.65s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| caddy v2 | -t1 -c500 -n2000 -m100  | 333.49 | 353.84ms | 1.89s | 5.98s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| caddy v2 | -t1 -c1000 -n10000 -m100  | failed | failed | failed | failed | -  | - | 0% | 100% |
+| nginx 1.16.1 CF HTTP/3 patched | -t1 -c150 -n1000 -m50  | 1856.67 | 213.84ms | 333.80ms | 510.07ms | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 CF HTTP/3 patched | -t1 -c500 -n2000 -m100  | 842.13 | 325.78ms | 834.50ms | 1.59s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 CF HTTP/3 patched | -t1 -c1000 -n10000 -m100  | 847.89 | 657.03ms | 3.58s | 9.09s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
 
 Against Nginx 1.16.1 patched with Cloudflare HTTP/3 support which have lower performance than Nginx 1.17.10 HTTP/2 HTTPS right now.
 
