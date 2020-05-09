@@ -101,7 +101,7 @@ req/s           :      12.79       45.22       29.52        8.17    60.00%
 
 ![caddy context switches|640x480](charts/sar/h2load-http3-may10-2020/caddy/contextsw.png)
 
-# Nginx 1.16.1 v2 Resource Usage
+# Nginx 1.16.1 Resource Usage
 
 ![nginx cpu|640x480](charts/sar/h2load-http3-may10-2020/nginx/cpu.png)
 
