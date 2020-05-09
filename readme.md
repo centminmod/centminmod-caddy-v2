@@ -120,7 +120,7 @@ Backup default Caddyfile
 cp -a /etc/caddy/Caddyfile /etc/caddy/Caddyfile-backup
 ```
 
-Overwrite /etc/caddy/Caddyfile with below config using default Caddy public web root `/usr/share/caddy` just for testing purposes right now and configure non-HTTPS (port 81) & HTTPS (port 4444) local internal self-signed SSL certificates. For properly comparison with Nginx, try to keep equivalent response headers for both Caddy and Nginx as Caddy previously in 0.1x and 1.x releases have been known to have a performance drop as you add more HTTP headers to Caddy's responses.
+Overwrite /etc/caddy/Caddyfile with below config using default Caddy public web root `/usr/share/caddy` just for testing purposes right now and configure non-HTTPS (port 81) & HTTPS (port 4444) local internal self-signed SSL certificates. For proper comparison with Nginx, try to keep equivalent response headers for both Caddy and Nginx as Caddy previously in 0.1x and 1.x releases have been known to have a performance drop as you add more HTTP headers to Caddy's responses.
 
 ```
 {
@@ -343,7 +343,7 @@ h2load HTTP/2 HTTPS test for Caddy HTTPS on port 4444 at `https://caddy.domain.c
 Caddy at 150 user concurrency
 
 ```
-h2load -t1 -c150 -n1000 -m50 -H Accept-Encoding:gzip https://caddy.domain.com:4444/caddy-index.html
+h2load -t1 -c150 -n1000 -m50 -H "Accept-Encoding:gzip" https://caddy.domain.com:4444/caddy-index.html
 starting benchmark...
 spawning thread #0: 150 total client(s). 1000 total requests
 TLS Protocol: TLSv1.2
@@ -375,7 +375,7 @@ req/s           :       5.83       32.80        8.22        4.19    92.67%
 Caddy at 500 user concurrency
 
 ```
-h2load -t1 -c500 -n2000 -m100 -H Accept-Encoding:gzip https://caddy.domain.com:4444/caddy-index.html
+h2load -t1 -c500 -n2000 -m100 -H "Accept-Encoding:gzip" https://caddy.domain.com:4444/caddy-index.html
 starting benchmark...
 spawning thread #0: 500 total client(s). 2000 total requests
 TLS Protocol: TLSv1.2
@@ -404,10 +404,10 @@ time to 1st byte:   711.60ms       1.98s       1.36s    395.53ms    55.20%
 req/s           :       2.00        5.61        3.15        1.01    64.60%
 ```
 
-Caddy at 1000 user concurrency with 10k requests where only 68.89% of requests succeeded and 31.11% of requests failed which artifically inflate requests/second throughput numbers
+Caddy at 1000 user concurrency with 10k requests where only 68.89% of requests succeeded and 31.11% of requests failed which artificially inflate requests/second throughput numbers
 
 ```
-h2load -t1 -c1000 -n10000 -m100 -H Accept-Encoding:gzip https://caddy.domain.com:4444/caddy-index.html 
+h2load -t1 -c1000 -n10000 -m100 -H "Accept-Encoding:gzip" https://caddy.domain.com:4444/caddy-index.html 
 starting benchmark...
 spawning thread #0: 1000 total client(s). 10000 total requests
 TLS Protocol: TLSv1.2
@@ -437,7 +437,7 @@ h2load HTTP/2 HTTPS test for Nginx HTTPS on port 443 at `https://ngx.domain.com/
 Nginx at 150 user concurrency
 
 ```
-h2load -t1 -c150 -n1000 -m50 -H Accept-Encoding:gzip https://ngx.domain.com/caddy-index.html
+h2load -t1 -c150 -n1000 -m50 -H "Accept-Encoding:gzip" https://ngx.domain.com/caddy-index.html
 starting benchmark...
 spawning thread #0: 150 total client(s). 1000 total requests
 TLS Protocol: TLSv1.2
@@ -469,7 +469,7 @@ req/s           :      13.71       44.23       24.21        8.72    72.67%
 Nginx at 500 user concurrency
 
 ```
-h2load -t1 -c500 -n2000 -m100 -H Accept-Encoding:gzip https://ngx.domain.com/caddy-index.html
+h2load -t1 -c500 -n2000 -m100 -H "Accept-Encoding:gzip" https://ngx.domain.com/caddy-index.html
 starting benchmark...
 spawning thread #0: 500 total client(s). 2000 total requests
 TLS Protocol: TLSv1.2
@@ -501,7 +501,7 @@ req/s           :       3.25        6.85        4.86        1.07    56.00%
 Nginx at 1000 user concurrency with 10k requests all succeeded
 
 ```
-h2load -t1 -c1000 -n10000 -m100 -H Accept-Encoding:gzip https://ngx.domain.com/caddy-index.html
+h2load -t1 -c1000 -n10000 -m100 -H "Accept-Encoding:gzip" https://ngx.domain.com/caddy-index.html
 starting benchmark...
 spawning thread #0: 1000 total client(s). 10000 total requests
 TLS Protocol: TLSv1.2
@@ -631,4 +631,119 @@ server {
   #include /usr/local/nginx/conf/errorpage.conf;
   include /usr/local/nginx/conf/vts_server.conf;
 }
+```
+
+# HTTP/3 HTTPS Tests
+
+Caddy v2 has [experimental HTTP/3 HTTPS](https://caddyserver.com/docs/caddyfile/options) support and Cloudflare has released a [Nginx HTTP/3 patch for Nginx 1.16.1](https://community.centminmod.com/threads/centmin-mod-nginx-with-cloudflare-http-3-nginx-patch.18482/) stable version.
+
+While Centmin Mod Nginx uses 1.17 mainline branch, I've made a private Centmin Mod 123.09beta01 branch with Cloudflare Nginx HTTP/3 patch support to test specifically Nginx 1.16.1 stable builds ith HTTP/3. I will use [nghttp2's HTTP/3 QUIC](https://github.com/nghttp2/nghttp2/tree/quic) supported branch to do h2load HTTP/3 TLSv1.3 tests in the future against both Caddy v2 and Nginx 1.16.1. Will update this readme with tests when available.
+
+Example of h2load HTTP/3 HTTPS TLSv1.3 tests with `TLS_AES_128_GCM_SHA256` cipher against Cloudflare proxied Centmin Mod Nginx server with Cloudflare HTTP/3 draft 27 enabled
+
+```
+h2load-http3 --version
+h2load nghttp2/1.41.0-DEV
+
+h2load-http3 -t1 -c1 -n10 https://servermanager.guide/
+starting benchmark...
+spawning thread #0: 1 total client(s). 10 total requests
+TLS Protocol: TLSv1.3
+Cipher: TLS_AES_128_GCM_SHA256
+Server Temp Key: X25519 253 bits
+Application protocol: h3-27
+progress: 10% done
+progress: 20% done
+progress: 30% done
+progress: 40% done
+progress: 50% done
+progress: 60% done
+progress: 70% done
+progress: 80% done
+progress: 90% done
+progress: 100% done
+
+finished in 525.23ms, 19.04 req/s, 3.70MB/s
+requests: 10 total, 10 started, 10 done, 10 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 10 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 1.94MB (2038301) total, 7.76KB (7942) headers (space savings 30.52%), 1.94MB (2029592) data
+                     min         max         mean         sd        +/- sd
+time for request:    33.40ms     96.79ms     48.41ms     19.01ms    90.00%
+time for connect:    40.81ms     40.81ms     40.81ms         0us   100.00%
+time to 1st byte:    80.93ms     80.93ms     80.93ms         0us   100.00%
+req/s           :      19.05       19.05       19.05        0.00   100.00%
+```
+
+curl with HTTP/3 support
+
+```
+curl-http3 --http3 -Iv https://servermanager.guide/
+*   Trying 2606:4700:3035::681b:9406:443...
+* Sent QUIC client Initial, ALPN: h3-27h3-25h3-24h3-23
+* Connected to servermanager.guide (2606:4700:3035::681b:9406) port 443 (#0)
+* h3 [:method: HEAD]
+* h3 [:path: /]
+* h3 [:scheme: https]
+* h3 [:authority: servermanager.guide]
+* h3 [user-agent: curl/7.70.1-DEV]
+* h3 [accept: */*]
+* Using HTTP/3 Stream ID: 0 (easy handle 0x555b7d03ff20)
+> HEAD / HTTP/3
+> Host: servermanager.guide
+> user-agent: curl/7.70.1-DEV
+> accept: */*
+> 
+< HTTP/3 200
+HTTP/3 200
+< date: Sat, 09 May 2020 08:14:56 GMT
+date: Sat, 09 May 2020 08:14:56 GMT
+< content-type: text/html; charset=UTF-8
+content-type: text/html; charset=UTF-8
+< set-cookie: __cfduid=de7fa5326fadd2f018acde6843d4ea8c21589012096; expires=Mon, 08-Jun-20 08:14:56 GMT; path=/; domain=.servermanager.guide; HttpOnly; SameSite=Lax; Secure
+set-cookie: __cfduid=de7fa5326fadd2f018acde6843d4ea8c21589012096; expires=Mon, 08-Jun-20 08:14:56 GMT; path=/; domain=.servermanager.guide; HttpOnly; SameSite=Lax; Secure
+< cf-ray: 5909f840cb6d5532-ORD
+cf-ray: 5909f840cb6d5532-ORD
+< age: 72622
+age: 72622
+< cache-control: public, max-age=86400
+cache-control: public, max-age=86400
+< expires: Sun, 10 May 2020 08:14:56 GMT
+expires: Sun, 10 May 2020 08:14:56 GMT
+< link: <https://servermanager.guide/wp-json/>; rel="https://api.w.org/"
+link: <https://servermanager.guide/wp-json/>; rel="https://api.w.org/"
+< strict-transport-security: max-age=31536000; includeSubdomains;
+strict-transport-security: max-age=31536000; includeSubdomains;
+< vary: Accept-Encoding
+vary: Accept-Encoding
+< cf-cache-status: HIT
+cf-cache-status: HIT
+< cf-cachetime: 86400
+cf-cachetime: 86400
+< cf-default-rule: 1
+cf-default-rule: 1
+< cf-req-country: CA
+cf-req-country: CA
+< cf-tls: TLSv1.3
+cf-tls: TLSv1.3
+< expect-ct: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+expect-ct: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+< feature-policy: accelerometer 'none'; camera 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; payment 'none'; usb 'none'
+feature-policy: accelerometer 'none'; camera 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; payment 'none'; usb 'none'
+< referrer-policy: strict-origin-when-cross-origin
+referrer-policy: strict-origin-when-cross-origin
+< x-content-type-options: nosniff
+x-content-type-options: nosniff
+< x-frame-options: SAMEORIGIN
+x-frame-options: SAMEORIGIN
+< x-powered-by: centminmod
+x-powered-by: centminmod
+< x-xss-protection: 1; mode=block
+x-xss-protection: 1; mode=block
+< server: cloudflare
+server: cloudflare
+< alt-svc: h3-27=":443"; ma=86400, h3-25=":443"; ma=86400, h3-24=":443"; ma=86400, h3-23=":443"; ma=86400
+alt-svc: h3-27=":443"; ma=86400, h3-25=":443"; ma=86400, h3-24=":443"; ma=86400, h3-23=":443"; ma=86400
+< cf-request-id: 029a197c7d000055329aafb200000001
+cf-request-id: 029a197c7d000055329aafb200000001
+* Connection #0 to host servermanager.guide left intact
 ```
