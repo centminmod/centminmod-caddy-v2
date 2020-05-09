@@ -698,9 +698,9 @@ h2load HTTP/3 TLSv1.3 test
 | caddy v2 | -t1 -c150 -n1000 -m50  | 594.60 | 230.02ms | 590.87ms | 1.65s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
 | caddy v2 | -t1 -c500 -n2000 -m100  | 333.49 | 353.84ms | 1.89s | 5.98s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
 | caddy v2 | -t1 -c1000 -n10000 -m100  | failed | failed | failed | failed | -  | - | 0% | 100% |
-| nginx 1.16.1 CF HTTP/3 patched | -t1 -c150 -n1000 -m50  | 1856.67 | 213.84ms | 333.80ms | 510.07ms | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
-| nginx 1.16.1 CF HTTP/3 patched | -t1 -c500 -n2000 -m100  | 842.13 | 325.78ms | 834.50ms | 1.59s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
-| nginx 1.16.1 CF HTTP/3 patched | -t1 -c1000 -n10000 -m100  | 847.89 | 657.03ms | 3.58s | 9.09s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 patch | -t1 -c150 -n1000 -m50  | 1856.67 | 213.84ms | 333.80ms | 510.07ms | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 patch | -t1 -c500 -n2000 -m100  | 842.13 | 325.78ms | 834.50ms | 1.59s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 patch | -t1 -c1000 -n10000 -m100  | 847.89 | 657.03ms | 3.58s | 9.09s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
 
 Against Nginx 1.16.1 patched with Cloudflare HTTP/3 support which have lower performance than Nginx 1.17.10 HTTP/2 HTTPS right now.
 
