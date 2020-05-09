@@ -66,12 +66,20 @@ echo "SELFSIGNEDSSL_ECDSA='y'" >> /etc/centminmod/custom_config.inc
 nv -d ngx.domain.com -s y -u $(pwgen -1cnys 31)
 ```
 
-If using real domains that have DNS resolving to server IP and want live Letsencrypt SSL certificates:
+If using real domains that have DNS resolving to server IP and want live Letsencrypt SSL certificates with both non-HTTPS + HTTPS, then use `-s lelive`:
 
 ```
 echo "LETSENCRYPT_DETECT='y'" >> /etc/centminmod/custom_config.inc
 echo "DUALCERTS='y'" >> /etc/centminmod/custom_config.inc
-nv -d ngx.domain.com -s y -u $(pwgen -1cnys 31)
+nv -d ngx.domain.com -s lelive -u $(pwgen -1cnys 31)
+```
+
+If using real domains that have DNS resolving to server IP and want live Letsencrypt SSL certificates with HTTPS default only, then use `-s lelived`:
+
+```
+echo "LETSENCRYPT_DETECT='y'" >> /etc/centminmod/custom_config.inc
+echo "DUALCERTS='y'" >> /etc/centminmod/custom_config.inc
+nv -d ngx.domain.com -s lelived -u $(pwgen -1cnys 31)
 ```
 
 * The first variable `LETSENCRYPT_DETECT='y'` enables regular RSA 2048bit SSL certificates via Letsencrypt.
