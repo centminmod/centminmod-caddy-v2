@@ -340,6 +340,18 @@ Total:         3885         434        3055
 
 h2load HTTP/2 HTTPS test for Caddy HTTPS on port 4444 at `https://caddy.domain.com:4444/caddy-index.html`
 
+
+##### HTTP/2 HTTPS Benchmarks
+
+| server | test | requests/s | ttfb min | ttfb avg | ttfb max | cipher | protocol | successful req | failed req |
+| ---| --- |--- |--- |--- |--- |--- |--- |---|---|
+| caddy v2 | h2load HTTP/2 -t1 -c150 -n1000 -m50  | 959.57 | 213.30ms | 696.74ms | 1.03s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 100% | 0% |
+| caddy v2 | h2load HTTP/2 -t1 -c500 -n2000 -m100  | 990.03 | 711.60ms | 1.36s | 1.98s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 100% | 0% |
+| caddy v2 | h2load HTTP/2 -t1 -c1000 -n10000 -m100  | 1049.00 | 965.65ms | 3.34s | 6.53s | ECDHE-ECDSA-AES256-GCM-SHA384  | h2 TLSv1.2 | 68.89% | 31.11% |
+| nginx 1.17.10 | h2load HTTP/2 -t1 -c150 -n1000 -m50  | 2224.74 | 158.04ms | 300.22ms | 440.22ms | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
+| nginx 1.17.10 | h2load HTTP/2 -t1 -c500 -n2000 -m100  | 1600.52 | 583.80ms | 861.70ms | 1.23s | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
+| nginx 1.17.10 | h2load HTTP/2 -t1 -c1000 -n10000 -m100  | 1912.05 | 949.61ms | 2.98s | 5.16s | ECDHE-ECDSA-AES128-GCM-SHA256  | h2 TLSv1.2 | 100% | 0% |
+
 Caddy at 150 user concurrency
 
 ```
@@ -635,19 +647,67 @@ server {
 
 # HTTP/3 HTTPS Tests
 
-Caddy v2 has [experimental HTTP/3 HTTPS](https://caddyserver.com/docs/caddyfile/options) support and Cloudflare has released a [Nginx HTTP/3 patch for Nginx 1.16.1](https://community.centminmod.com/threads/centmin-mod-nginx-with-cloudflare-http-3-nginx-patch.18482/) stable version.
+Caddy v2 has [experimental HTTP/3 HTTPS](https://caddyserver.com/docs/caddyfile/options) support and Cloudflare has released a [Nginx HTTP/3 patch for Nginx 1.16.1](https://community.centminmod.com/threads/centmin-mod-nginx-with-cloudflare-http-3-nginx-patch.18482/) stable version. Both HTTP/3 implementations are at very early stages so not really suited for production right now.
 
-While Centmin Mod Nginx uses 1.17 mainline branch, I've made a private Centmin Mod 123.09beta01 branch with Cloudflare Nginx HTTP/3 patch support to test specifically Nginx 1.16.1 stable builds ith HTTP/3. I will use [nghttp2's HTTP/3 QUIC](https://github.com/nghttp2/nghttp2/tree/quic) supported branch to do h2load HTTP/3 TLSv1.3 tests in the future against both Caddy v2 and Nginx 1.16.1. Will update this readme with tests when available.
+While Centmin Mod Nginx uses 1.17 mainline branch, I've made a private Centmin Mod 123.09beta01 branch with Cloudflare Nginx HTTP/3 patch support to test specifically Nginx 1.16.1 stable builds with HTTP/3. I will use [nghttp2's HTTP/3 QUIC](https://github.com/nghttp2/nghttp2/tree/quic) supported branch to do h2load HTTP/3 TLSv1.3 tests in the future against both Caddy v2 and Nginx 1.16.1. Will update this readme with tests when available.
 
-Example of h2load HTTP/3 HTTPS TLSv1.3 tests with `TLS_AES_128_GCM_SHA256` cipher against Cloudflare proxied Centmin Mod Nginx server with Cloudflare HTTP/3 draft 27 enabled
+h2load HTTP/3 HTTPS testing tool.
 
 ```
 h2load-http3 --version
 h2load nghttp2/1.41.0-DEV
+```
 
-h2load-http3 -t1 -c1 -n10 https://servermanager.guide/
+Centmin Mod Nginx 1.16.1 build with [Cloudflare HTTP/3 over QUIC patches](https://github.com/cloudflare/quiche/tree/master/extras/nginx) using BoringSSQL + [Cloudflare Quiche library](https://github.com/cloudflare/quiche)
+
+Note the `--with-http_v3_module --with-openssl=../quiche/deps/boringssl --with-quiche=../quiche` options
+
+```
+nginx -V
+nginx version: nginx/1.16.1 (090520-135334-centos7-virtualbox-kvm-d9e4773-quiche-85ca070)
+built by gcc 8.3.1 20190311 (Red Hat 8.3.1-3) (GCC) 
+built with OpenSSL 1.1.0 (compatible; BoringSSL) (running with BoringSSL)
+TLS SNI support enabled
+```
+> configure arguments: --with-ld-opt='-Wl,-E -L/usr/local/zlib-cf/lib -L../quiche/deps/boringssl/.openssl/lib -L/usr/local/lib -ljemalloc -Wl,-z,relro -Wl,-rpath,../quiche/deps/boringssl/.openssl/lib:/usr/local/zlib-cf/lib:/usr/local/lib' --with-cc-opt='-I../quiche/deps/boringssl/.openssl/include -I/usr/local/zlib-cf/include -I/usr/local/include -m64 -march=native -DTCP_FASTOPEN=23 -g -O3 -fstack-protector-strong --param=ssp-buffer-size=4 -Wformat -Werror=format-security -Wimplicit-fallthrough=0 -fcode-hoisting -Wno-cast-function-type -Wno-format-extra-args -Wp,-D_FORTIFY_SOURCE=2' --sbin-path=/usr/local/sbin/nginx --conf-path=/usr/local/nginx/conf/nginx.conf --build=090520-113914-centos7-virtualbox-kvm-d9e4773-quiche-85ca070 --with-compat --with-http_stub_status_module --with-http_secure_link_module --with-libatomic --with-http_gzip_static_module --with-http_sub_module --with-http_addition_module --with-http_image_filter_module --with-http_geoip_module --with-stream_geoip_module --with-stream_realip_module --with-stream_ssl_preread_module --with-threads --with-stream --with-stream_ssl_module --with-http_realip_module --add-dynamic-module=../ngx-fancyindex-0.4.2 --add-module=../ngx_cache_purge-2.5 --add-module=../ngx_devel_kit-0.3.0 --add-module=../set-misc-nginx-module-0.32 --add-module=../echo-nginx-module-0.61 --add-module=../redis2-nginx-module-0.15 --add-module=../ngx_http_redis-0.3.7 --add-module=../memc-nginx-module-0.18 --add-module=../srcache-nginx-module-0.31 --add-module=../headers-more-nginx-module-0.33 --with-pcre-jit --with-zlib=../zlib-cloudflare-1.3.0 --with-http_ssl_module --with-http_v2_module --with-http_v3_module --with-openssl=../quiche/deps/boringssl --with-quiche=../quiche
+
+Test `ngx.domain.com` site test over curl with HTTP/3 support built using Cloudflare Quiche library.
+
+```
+curl-http3 --http3 -skD - -H "Accept-Encoding: gzip" https://ngx.domain.com/caddy-index.html -o /dev/null          
+HTTP/3 200
+date: Sat, 09 May 2020 15:01:22 GMT
+content-type: text/html; charset=utf-8
+last-modified: Wed, 06 May 2020 18:44:09 GMT
+vary: Accept-Encoding
+etag: W/"5eb30579-2fc2"
+server: nginx centminmod
+x-powered-by: centminmod
+alt-svc: h3-27=":443"; ma=86400
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+content-encoding: gzip
+```
+
+h2load HTTP/3 TLSv1.3 test 
+
+##### HTTP/3 HTTPS Benchmarks
+
+| server | test | requests/s | ttfb min | ttfb avg | ttfb max | cipher | protocol | successful req | failed req |
+| ---| --- |--- |--- |--- |--- |--- |--- |---|---|
+| caddy v2 | h2load HTTP/3 -t1 -c150 -n1000 -m50  | 594.60 | 230.02ms | 590.87ms | 1.65s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| caddy v2 | h2load HTTP/3 -t1 -c500 -n2000 -m100  | 333.49 | 353.84ms | 1.89s | 5.98s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| caddy v2 | h2load HTTP/3 -t1 -c1000 -n10000 -m100  | failed | failed | failed | failed | -  | - | 0% | 100% |
+| nginx 1.16.1 CF HTTP/3 patched | h2load HTTP/3 -t1 -c150 -n1000 -m50  | 1856.67 | 213.84ms | 333.80ms | 510.07ms | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 CF HTTP/3 patched | h2load HTTP/3 -t1 -c500 -n2000 -m100  | 842.13 | 325.78ms | 834.50ms | 1.59s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+| nginx 1.16.1 CF HTTP/3 patched | h2load HTTP/3 -t1 -c1000 -n10000 -m100  | 847.89 | 657.03ms | 3.58s | 9.09s | TLS_AES_128_GCM_SHA256  | h3-27 TLSv1.3 | 100% | 0% |
+
+Against Nginx 1.16.1 patched with Cloudflare HTTP/3 support which have lower performance than Nginx 1.17.10 HTTP/2 HTTPS right now.
+
+```
+h2load-http3 -t1 -c150 -n1000 -m50 -H "Accept-Encoding:gzip" https://ngx.domain.com/caddy-index.html
 starting benchmark...
-spawning thread #0: 1 total client(s). 10 total requests
+spawning thread #0: 150 total client(s). 1000 total requests
 TLS Protocol: TLSv1.3
 Cipher: TLS_AES_128_GCM_SHA256
 Server Temp Key: X25519 253 bits
@@ -663,87 +723,173 @@ progress: 80% done
 progress: 90% done
 progress: 100% done
 
-finished in 525.23ms, 19.04 req/s, 3.70MB/s
-requests: 10 total, 10 started, 10 done, 10 succeeded, 0 failed, 0 errored, 0 timeout
-status codes: 10 2xx, 0 3xx, 0 4xx, 0 5xx
-traffic: 1.94MB (2038301) total, 7.76KB (7942) headers (space savings 30.52%), 1.94MB (2029592) data
+finished in 538.60ms, 1856.67 req/s, 9.32MB/s
+requests: 1000 total, 1000 started, 1000 done, 1000 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 1000 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 5.02MB (5265200) total, 136.72KB (140000) headers (space savings 55.13%), 4.87MB (5104000) data
                      min         max         mean         sd        +/- sd
-time for request:    33.40ms     96.79ms     48.41ms     19.01ms    90.00%
-time for connect:    40.81ms     40.81ms     40.81ms         0us   100.00%
-time to 1st byte:    80.93ms     80.93ms     80.93ms         0us   100.00%
-req/s           :      19.05       19.05       19.05        0.00   100.00%
+time for request:   260.61ms    421.05ms    334.73ms     40.78ms    62.80%
+time for connect:    84.07ms    210.35ms    147.01ms     35.29ms    56.00%
+time to 1st byte:   213.84ms    510.07ms    333.80ms     72.01ms    64.00%
+req/s           :      11.62       16.33       13.83        1.42    60.00%
 ```
 
-curl with HTTP/3 support
+```
+h2load-http3 -t1 -c500 -n2000 -m100 -H "Accept-Encoding:gzip" https://ngx.domain.com/caddy-index.html
+starting benchmark...
+spawning thread #0: 500 total client(s). 2000 total requests
+TLS Protocol: TLSv1.3
+Cipher: TLS_AES_128_GCM_SHA256
+Server Temp Key: X25519 253 bits
+Application protocol: h3-27
+progress: 10% done
+progress: 20% done
+progress: 30% done
+progress: 40% done
+progress: 50% done
+progress: 60% done
+progress: 70% done
+progress: 80% done
+progress: 90% done
+progress: 100% done
+
+finished in 2.37s, 842.13 req/s, 4.24MB/s
+requests: 2000 total, 2000 started, 2000 done, 2000 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 2000 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 10.06MB (10548000) total, 273.44KB (280000) headers (space savings 55.13%), 9.74MB (10208000) data
+                     min         max         mean         sd        +/- sd
+time for request:     5.23ms       1.93s    372.74ms    293.49ms    86.60%
+time for connect:   160.48ms       1.59s    654.79ms    386.72ms    59.40%
+time to 1st byte:   325.78ms       1.59s    834.50ms    342.22ms    55.20%
+req/s           :       1.69        7.62        4.27        1.45    73.00%
+```
 
 ```
-curl-http3 --http3 -Iv https://servermanager.guide/
-*   Trying 2606:4700:3035::681b:9406:443...
-* Sent QUIC client Initial, ALPN: h3-27h3-25h3-24h3-23
-* Connected to servermanager.guide (2606:4700:3035::681b:9406) port 443 (#0)
-* h3 [:method: HEAD]
-* h3 [:path: /]
-* h3 [:scheme: https]
-* h3 [:authority: servermanager.guide]
-* h3 [user-agent: curl/7.70.1-DEV]
-* h3 [accept: */*]
-* Using HTTP/3 Stream ID: 0 (easy handle 0x555b7d03ff20)
-> HEAD / HTTP/3
-> Host: servermanager.guide
-> user-agent: curl/7.70.1-DEV
-> accept: */*
-> 
-< HTTP/3 200
+h2load-http3 -t1 -c1000 -n10000 -m100 -H "Accept-Encoding:gzip" https://ngx.domain.com/caddy-index.html
+starting benchmark...
+spawning thread #0: 1000 total client(s). 10000 total requests
+TLS Protocol: TLSv1.3
+Cipher: TLS_AES_128_GCM_SHA256
+Server Temp Key: X25519 253 bits
+Application protocol: h3-27
+progress: 10% done
+progress: 20% done
+progress: 30% done
+progress: 40% done
+progress: 50% done
+progress: 60% done
+progress: 70% done
+progress: 80% done
+progress: 90% done
+progress: 100% done
+
+finished in 11.79s, 847.89 req/s, 4.25MB/s
+requests: 10000 total, 10000 started, 10000 done, 10000 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 10000 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 50.17MB (52608000) total, 1.34MB (1400000) headers (space savings 55.13%), 48.68MB (51040000) data
+                     min         max         mean         sd        +/- sd
+time for request:    84.10ms      11.14s       1.38s       1.18s    81.60%
+time for connect:   407.04ms       8.84s       2.90s       2.54s    84.90%
+time to 1st byte:   657.03ms       9.09s       3.58s       2.31s    66.40%
+req/s           :       0.85        7.88        2.97        1.62    78.80%
+```
+
+Caddy v2 HTTP/3 with `experimental_http3` enabled
+
+```
+curl-http3 --http3 -skD - -H "Accept-Encoding: gzip" https://caddy.domain.com:4444/caddy-index.html -o /dev/null
 HTTP/3 200
-< date: Sat, 09 May 2020 08:14:56 GMT
-date: Sat, 09 May 2020 08:14:56 GMT
-< content-type: text/html; charset=UTF-8
-content-type: text/html; charset=UTF-8
-< set-cookie: __cfduid=de7fa5326fadd2f018acde6843d4ea8c21589012096; expires=Mon, 08-Jun-20 08:14:56 GMT; path=/; domain=.servermanager.guide; HttpOnly; SameSite=Lax; Secure
-set-cookie: __cfduid=de7fa5326fadd2f018acde6843d4ea8c21589012096; expires=Mon, 08-Jun-20 08:14:56 GMT; path=/; domain=.servermanager.guide; HttpOnly; SameSite=Lax; Secure
-< cf-ray: 5909f840cb6d5532-ORD
-cf-ray: 5909f840cb6d5532-ORD
-< age: 72622
-age: 72622
-< cache-control: public, max-age=86400
-cache-control: public, max-age=86400
-< expires: Sun, 10 May 2020 08:14:56 GMT
-expires: Sun, 10 May 2020 08:14:56 GMT
-< link: <https://servermanager.guide/wp-json/>; rel="https://api.w.org/"
-link: <https://servermanager.guide/wp-json/>; rel="https://api.w.org/"
-< strict-transport-security: max-age=31536000; includeSubdomains;
-strict-transport-security: max-age=31536000; includeSubdomains;
-< vary: Accept-Encoding
-vary: Accept-Encoding
-< cf-cache-status: HIT
-cf-cache-status: HIT
-< cf-cachetime: 86400
-cf-cachetime: 86400
-< cf-default-rule: 1
-cf-default-rule: 1
-< cf-req-country: CA
-cf-req-country: CA
-< cf-tls: TLSv1.3
-cf-tls: TLSv1.3
-< expect-ct: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
-expect-ct: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
-< feature-policy: accelerometer 'none'; camera 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; payment 'none'; usb 'none'
-feature-policy: accelerometer 'none'; camera 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; payment 'none'; usb 'none'
-< referrer-policy: strict-origin-when-cross-origin
-referrer-policy: strict-origin-when-cross-origin
-< x-content-type-options: nosniff
-x-content-type-options: nosniff
-< x-frame-options: SAMEORIGIN
-x-frame-options: SAMEORIGIN
-< x-powered-by: centminmod
-x-powered-by: centminmod
-< x-xss-protection: 1; mode=block
 x-xss-protection: 1; mode=block
-< server: cloudflare
-server: cloudflare
-< alt-svc: h3-27=":443"; ma=86400, h3-25=":443"; ma=86400, h3-24=":443"; ma=86400, h3-23=":443"; ma=86400
-alt-svc: h3-27=":443"; ma=86400, h3-25=":443"; ma=86400, h3-24=":443"; ma=86400, h3-23=":443"; ma=86400
-< cf-request-id: 029a197c7d000055329aafb200000001
-cf-request-id: 029a197c7d000055329aafb200000001
-* Connection #0 to host servermanager.guide left intact
+etag: "q9xapl9fm"
+content-type: text/html; charset=utf-8
+last-modified: Wed, 06 May 2020 18:44:09 GMT
+content-encoding: gzip
+x-powered-by: caddy centminmod
+alt-svc: h3-27=":4444"; ma=2592000
+x-content-type-options: nosniff
+vary: Accept-Encoding
+server: Caddy
+```
+
+h2load HTTP/3 TLSv1.3 test against Caddy v2 HTTP/3
+
+```
+h2load-http3 -t1 -c150 -n1000 -m50 -H "Accept-Encoding:gzip" https://caddy.domain.com:4444/caddy-index.html
+starting benchmark...
+spawning thread #0: 150 total client(s). 1000 total requests
+TLS Protocol: TLSv1.3
+Cipher: TLS_AES_128_GCM_SHA256
+Server Temp Key: ECDH P-256 256 bits
+Application protocol: h3-27
+progress: 10% done
+progress: 20% done
+progress: 30% done
+progress: 40% done
+progress: 50% done
+progress: 60% done
+progress: 70% done
+progress: 80% done
+progress: 90% done
+progress: 100% done
+
+finished in 1.68s, 594.60 req/s, 3.19MB/s
+requests: 1000 total, 1000 started, 1000 done, 1000 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 1000 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 5.36MB (5618450) total, 295.90KB (303000) headers (space savings -11.81%), 5.00MB (5240000) data
+                     min         max         mean         sd        +/- sd
+time for request:    37.03ms       1.29s    426.29ms    234.26ms    75.70%
+time for connect:    90.36ms       1.62s    371.05ms    396.46ms    91.33%
+time to 1st byte:   230.02ms       1.65s    590.87ms    404.86ms    86.00%
+req/s           :       3.93       24.03        9.59        4.19    74.67%
+```
+
+```
+h2load-http3 -t1 -c500 -n2000 -m100 -H "Accept-Encoding:gzip" https://caddy.domain.com:4444/caddy-index.html
+starting benchmark...
+spawning thread #0: 500 total client(s). 2000 total requests
+TLS Protocol: TLSv1.3
+Cipher: TLS_AES_128_GCM_SHA256
+Server Temp Key: ECDH P-256 256 bits
+Application protocol: h3-27
+progress: 10% done
+progress: 20% done
+progress: 30% done
+progress: 40% done
+progress: 50% done
+progress: 60% done
+progress: 70% done
+progress: 80% done
+progress: 90% done
+progress: 100% done
+
+finished in 6.00s, 333.49 req/s, 1.79MB/s
+requests: 2000 total, 2000 started, 2000 done, 2000 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 2000 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 10.72MB (11237500) total, 591.80KB (606000) headers (space savings -11.81%), 9.99MB (10480000) data
+                     min         max         mean         sd        +/- sd
+time for request:    34.81ms       5.64s    965.59ms    846.91ms    71.80%
+time for connect:   120.68ms       4.71s       1.15s    965.09ms    86.80%
+time to 1st byte:   353.84ms       5.98s       1.89s       1.08s    76.80%
+req/s           :       0.67        7.85        2.50        1.52    78.80%
+```
+
+At 1000 user concurrency like HTTP/2 HTTPS tests, Caddy seems to fail with the `ERR_DRAINING` message which apparently means h2load received a `CONNECTION_CLOSE` frame from Caddy = Caddy crashed ???
+
+```
+h2load-http3 -t1 -c1000 -n10000 -m100 -H "Accept-Encoding:gzip" https://caddy.domain.com:4444/caddy-index.html 
+starting benchmark...
+spawning thread #0: 1000 total client(s). 10000 total requests
+TLS Protocol: TLSv1.3
+Cipher: TLS_AES_128_GCM_SHA256
+Server Temp Key: ECDH P-256 256 bits
+Application protocol: h3-27
+progress: 10% done
+progress: 20% done
+progress: 30% done
+ngtcp2_conn_read_pkt: ERR_DRAINING
+ngtcp2_conn_read_pkt: ERR_DRAINING
+ngtcp2_conn_read_pkt: ERR_DRAINING
+ngtcp2_conn_read_pkt: ERR_DRAINING
+ngtcp2_conn_read_pkt: ERR_DRAINING
+ngtcp2_conn_read_pkt: ERR_DRAINING
 ```
