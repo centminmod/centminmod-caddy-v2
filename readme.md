@@ -298,6 +298,13 @@ Content-Encoding: gzip
 
 ## Caddy vs Centmin Mod Nginx HTTP/2 HTTPS Benchmarks
 
+**Test Parameters**
+
+Using [h2load tester](https://nghttp2.org/documentation/h2load-howto.html)
+
+* h2load HTTP/2 HTTPS load tests at 150, 500 and 1,000 user concurrency at different number of requests and max concurrent stream parameters
+* h2load HTTP/3 HTTPS load tests at 150, 500 and 1,000 user concurrency at different number of requests and max concurrent stream parameters
+
 Centmin Mod LEMP stack already installs nghttp2 so has access to h2load HTTP/2 load testing tool.
 
 On Virtualbox CentOS 7.8 guest OS on Windows 10 Pro laptop
@@ -658,7 +665,7 @@ h2load-http3 --version
 h2load nghttp2/1.41.0-DEV
 ```
 
-Centmin Mod Nginx 1.16.1 build with [Cloudflare HTTP/3 over QUIC patches](https://github.com/cloudflare/quiche/tree/master/extras/nginx) using BoringSSQL + [Cloudflare Quiche library](https://github.com/cloudflare/quiche)
+Centmin Mod Nginx 1.16.1 build with [Cloudflare HTTP/3 over QUIC patches](https://github.com/cloudflare/quiche/tree/master/extras/nginx) using BoringSSL + [Cloudflare Quiche library](https://github.com/cloudflare/quiche)
 
 Note the `--with-http_v3_module --with-openssl=../quiche/deps/boringssl --with-quiche=../quiche` options
 
