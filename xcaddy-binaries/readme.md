@@ -5,6 +5,32 @@ The following Caddy v2 custom binaries were built using go 1.14.2 with [xcaddy](
 * caddy-gcc9 is caddy v2 binary built with GCC 9.1.1 compiler
 
 ```
+mkdir -p /var/log/caddy /usr/share/caddy /etc/caddy
+wget -4 -O /usr/share/caddy/index.html https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/welcome.html
+wget -4 -O /etc/caddy/Caddyfile https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/Caddyfile
+wget -4 https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/caddy-gcc9.zip
+wget -4 -O /usr/lib/systemd/system/caddy.service https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/caddy.service
+chown -R caddy:caddy /var/log/caddy /usr/share/caddy
+unzip caddy-gcc9.zip -d /usr/bin
+rm -f caddy-gcc9.zip
+if [ -f /usr/bin/caddy ]; then cp -a /usr/bin/caddy /usr/bin/caddy-orig; fi
+mv -f /usr/bin/caddy-gcc9 /usr/bin/caddy
+chmod +x /usr/bin/caddy
+caddy trust
+sed -i 's|:80|:81\n\nheader x-powered-by "caddy centminmod"\nnencode gzip\n|' /etc/caddy/Caddyfile
+service caddy start
+service caddy status
+chkconfig caddy on
+journalctl -u caddy --no-pager
+
+echo "service caddy stop" >/usr/bin/caddystop ; chmod 700 /usr/bin/caddystop
+echo "service caddy start" >/usr/bin/caddystart ; chmod 700 /usr/bin/caddystart
+echo "service caddy status" >/usr/bin/caddystatus ; chmod 700 /usr/bin/caddystatus
+echo "service caddy restart" >/usr/bin/caddyrestart ; chmod 700 /usr/bin/caddyrestart
+echo "service caddy reload" >/usr/bin/caddyreload ; chmod 700 /usr/bin/caddyreload
+```
+
+```
 ./caddy version
 v2.0.0 h1:pQSaIJGFluFvu8KDGDODV8u4/QRED/OPyIR+MWYYse8=
 
