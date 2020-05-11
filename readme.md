@@ -908,3 +908,30 @@ ngtcp2_conn_read_pkt: ERR_DRAINING
 ngtcp2_conn_read_pkt: ERR_DRAINING
 ngtcp2_conn_read_pkt: ERR_DRAINING
 ```
+
+# Comparing HTTP/2 Settings
+
+Using nghttp2 to check the HTTP/2 `SETTINGS_` defaults for a HTTP/2 connection
+
+Caddy
+
+```
+nghttp -ynvs https://caddy.domain.com:4444/caddy-index.html | grep SETTINGS_
+          [SETTINGS_MAX_FRAME_SIZE(0x05):1048576]
+          [SETTINGS_MAX_CONCURRENT_STREAMS(0x03):250]
+          [SETTINGS_MAX_HEADER_LIST_SIZE(0x06):1048896]
+          [SETTINGS_INITIAL_WINDOW_SIZE(0x04):1048576]
+          [SETTINGS_MAX_CONCURRENT_STREAMS(0x03):100]
+          [SETTINGS_INITIAL_WINDOW_SIZE(0x04):65535]
+```
+
+Nginx
+
+```
+nghttp -ynvs https://ngx.domain.com/caddy-index.html | grep SETTINGS_
+          [SETTINGS_MAX_CONCURRENT_STREAMS(0x03):128]
+          [SETTINGS_INITIAL_WINDOW_SIZE(0x04):65536]
+          [SETTINGS_MAX_FRAME_SIZE(0x05):16777215]
+          [SETTINGS_MAX_CONCURRENT_STREAMS(0x03):100]
+          [SETTINGS_INITIAL_WINDOW_SIZE(0x04):65535]
+```
