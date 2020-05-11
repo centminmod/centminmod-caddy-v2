@@ -430,3 +430,89 @@ req/s           :     205.36      248.13      226.62        9.51    69.39%
 ```
 
 **Summary:** Seems there's only 0.9 to 1.25% difference between `caddy-gcc9` vs `caddy` binary.
+
+And quick compare to Centmin Mod Nginx 1.17.10 on same Intel Core i7 4790K Haswell based server
+
+```
+caddystop; caddygccstop; ngxrestart; sleep 30; h2load -t1 -c50 -D 20 --warm-up-time=5 -m50 -H "Accept-Encoding:gzip" https://ngx2.domain.com/caddy-index.html
+```
+
+1st run for Nginx
+
+```
+caddystop; caddygccstop; ngxrestart; sleep 30; h2load -t1 -c50 -D 20 --warm-up-time=5 -m50 -H "Accept-Encoding:gzip" https://ngx2.domain.com/caddy-index.html
+Redirecting to /bin/systemctl stop caddy.service
+Redirecting to /bin/systemctl stop caddygcc.service
+Restarting nginx (via systemctl):                          [  OK  ]
+starting benchmark...
+spawning thread #0: 50 total client(s). Timing-based test with 5s of warm-up time and 20s of main duration for measurements.
+Warm-up started for thread #0.
+progress: 10% of clients started
+progress: 20% of clients started
+progress: 30% of clients started
+progress: 40% of clients started
+progress: 50% of clients started
+progress: 60% of clients started
+progress: 70% of clients started
+progress: 80% of clients started
+progress: 90% of clients started
+progress: 100% of clients started
+TLS Protocol: TLSv1.2
+Cipher: ECDHE-ECDSA-AES128-GCM-SHA256
+Server Temp Key: ECDH P-256 256 bits
+Application protocol: h2
+Warm-up phase is over for thread #0.
+Main benchmark duration is started for thread #0.
+Main benchmark duration is over for thread #0. Stopping all clients.
+Stopped all clients for thread #0
+
+finished in 25.01s, 23102.85 req/s, 113.09MB/s
+requests: 462057 total, 462057 started, 462057 done, 462057 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 462057 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 2.21GB (2371761581) total, 6.09MB (6390797) headers (space savings 96.09%), 2.75GB (2947951982) data
+                     min         max         mean         sd        +/- sd
+time for request:     4.33ms    623.48ms    108.06ms     61.57ms    76.38%
+time for connect:        0us         0us         0us         0us     0.00%
+time to 1st byte:        0us         0us         0us         0us     0.00%
+req/s           :     320.15     1033.84      462.01      216.06    88.00%
+```
+
+2nd run for Nginx
+
+```
+caddystop; caddygccstop; ngxrestart; sleep 30; h2load -t1 -c50 -D 20 --warm-up-time=5 -m50 -H "Accept-Encoding:gzip" https://ngx2.domain.com/caddy-index.html
+Redirecting to /bin/systemctl stop caddy.service
+Redirecting to /bin/systemctl stop caddygcc.service
+Restarting nginx (via systemctl):                          [  OK  ]
+starting benchmark...
+spawning thread #0: 50 total client(s). Timing-based test with 5s of warm-up time and 20s of main duration for measurements.
+Warm-up started for thread #0.
+progress: 10% of clients started
+progress: 20% of clients started
+progress: 30% of clients started
+progress: 40% of clients started
+progress: 50% of clients started
+progress: 60% of clients started
+progress: 70% of clients started
+progress: 80% of clients started
+progress: 90% of clients started
+progress: 100% of clients started
+TLS Protocol: TLSv1.2
+Cipher: ECDHE-ECDSA-AES128-GCM-SHA256
+Server Temp Key: ECDH P-256 256 bits
+Application protocol: h2
+Warm-up phase is over for thread #0.
+Main benchmark duration is started for thread #0.
+Main benchmark duration is over for thread #0. Stopping all clients.
+Stopped all clients for thread #0
+
+finished in 25.01s, 23135.30 req/s, 113.25MB/s
+requests: 462706 total, 462706 started, 462706 done, 462706 succeeded, 0 failed, 0 errored, 0 timeout
+status codes: 462705 2xx, 0 3xx, 0 4xx, 0 5xx
+traffic: 2.21GB (2375088791) total, 6.10MB (6399806) headers (space savings 96.09%), 2.75GB (2952133184) data
+                     min         max         mean         sd        +/- sd
+time for request:     2.89ms    494.52ms    107.78ms     74.84ms    62.32%
+time for connect:        0us         0us         0us         0us     0.00%
+time to 1st byte:        0us         0us         0us         0us     0.00%
+req/s           :     227.36     1438.22      462.66      306.72    92.00%
+```
