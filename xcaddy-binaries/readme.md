@@ -8,16 +8,27 @@ The following Caddy v2 custom binaries were built using go 1.14.2 with [xcaddy](
 mkdir -p /var/log/caddy /usr/share/caddy /etc/caddy
 wget -4 -O /usr/share/caddy/index.html https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/welcome.html
 wget -4 -O /etc/caddy/Caddyfile https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/Caddyfile
+
 wget -4 https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/caddy-gcc9.zip
+# or
+# wget -4 https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/caddy.zip
+
 wget -4 -O /usr/lib/systemd/system/caddy.service https://github.com/centminmod/centminmod-caddy-v2/raw/master/xcaddy-binaries/caddy.service
-chown -R caddy:caddy /var/log/caddy /usr/share/caddy
-unzip caddy-gcc9.zip -d /usr/bin
+groupadd --system caddy
+useradd --system  --gid caddy  --create-home  --home-dir /var/lib/caddy  --shell /usr/sbin/nologin  --comment "Caddy web server"  caddy
+chown -R caddy:caddy /var/log/caddy /usr/share/caddy /etc/caddy
+
+unzip -o caddy-gcc9.zip -d /usr/bin
 rm -f caddy-gcc9.zip
+# or
+# unzip -o caddy.zip -d /usr/bin
+# rm -f caddy.zip
+
 if [ -f /usr/bin/caddy ]; then cp -a /usr/bin/caddy /usr/bin/caddy-orig; fi
 mv -f /usr/bin/caddy-gcc9 /usr/bin/caddy
 chmod +x /usr/bin/caddy
 caddy trust
-sed -i 's|:80|:81\n\nheader x-powered-by "caddy centminmod"\nnencode gzip\n|' /etc/caddy/Caddyfile
+sed -i 's|^:80|:81\n\nheader x-powered-by "caddy centminmod"\nencode gzip\n|' /etc/caddy/Caddyfile
 service caddy start
 service caddy status
 chkconfig caddy on

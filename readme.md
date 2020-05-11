@@ -93,7 +93,7 @@ Install Caddy v2 via COPR EPEL 7 YUM repo ensuring to disable EPEL repo to preve
 yum-config-manager --add-repo https://copr.fedorainfracloud.org/coprs/g/caddy/caddy/repo/epel-7/group_caddy-caddy-epel-7.repo
 yum -y install caddy --disablerepo=epel
 caddy trust
-sed -i 's|:80|http://caddy.domain.com:81\n\nheader x-powered-by "caddy centminmod"\nheader vary Accept-Encoding\nencode gzip\n|' /etc/caddy/Caddyfile
+sed -i 's|^:80|http://caddy.domain.com:81\n\nheader x-powered-by "caddy centminmod"\nencode gzip\n|' /etc/caddy/Caddyfile
 mkdir -p /var/log/caddy
 chown caddy:caddy /var/log/caddy
 service caddy start
